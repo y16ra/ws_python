@@ -10,6 +10,7 @@ Websocketを使っています。
 # 利用モジュール
 * flask
 * gevent-websocket
+* Flask-uWSGI-WebSocket
 
 # Install
 ```
