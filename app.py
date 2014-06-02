@@ -3,15 +3,15 @@
 
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
-from flask import Flask, request
 from werkzeug.exceptions import abort
+from flask import Flask, request
 
 chat_clients = set()
 
 app = Flask(__name__)
 
-@app.route('/')
-def echo():
+@app.route('/chat')
+def chat():
     # environ['wsgi.websocket'] から WebSocket オブジェクトが得られる
     ws = request.environ['wsgi.websocket']
 
@@ -43,7 +43,7 @@ def echo():
                     chat_clients.remove(ec)
 
     except geventwebsocket.WebSocketError, ex:
-        print "{0}: {1}".format(ex.__class__.__name__, ex)    
+        print "{0}: {1}".format(ex.__class__.__name__, ex)
 
     finally:
         # 退室処理
