@@ -11,8 +11,17 @@ Websocketを使っています。
 * flask
 * gevent-websocket
 
+# Install
+```
+git clone https://github.com/y16ra/ws_python.git
+pip install -r requirements.txt
+```
+# WebSocket serverの起動
+```
+sh runserver.sh
+```
 # 機能
-* port 8080で起動します
+* port 8090で起動します
 * ユーザ名としてIPを使ってますが変更予定
 * ルームは１つだけ(接続した人は全て同じ部屋で会話することになります)
 * 接続しているユーザ全員にメッセージが届きます。
