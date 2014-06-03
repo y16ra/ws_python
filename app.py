@@ -2,13 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from geventwebsocket.handler import WebSocketHandler
+from geventwebsocket.websocket import WebSocketError
 from gevent.pywsgi import WSGIServer
 from werkzeug.exceptions import abort
-from flask import Flask, request
+from flask import Flask, request, render_template
+import logging
 
 chat_clients = set()
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
+app.logger.setLevel(logging.INFO)
+app.debug = True
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/chat')
 def chat():
@@ -16,39 +25,41 @@ def chat():
     ws = request.environ['wsgi.websocket']
 
     if ws is None:
-        print "ws is none"
+        app.logger.info("ws is none")
         abort(400)
 
     chat_clients.add(ws)
 
-    print 'enter:', len(chat_clients), request.environ['REMOTE_ADDR'], request.environ['REMOTE_PORT']
+    app.logger.info('enter:' + str(len(chat_clients)) + '/' + request.environ['REMOTE_ADDR'] + '/' + str(request.environ['REMOTE_PORT']));
+    #print 'enter:', len(chat_clients), request.environ['REMOTE_ADDR'], request.environ['REMOTE_PORT']
     user_name = request.environ['REMOTE_ADDR'] + ":" + request.environ['REMOTE_PORT']
 
     try:
         while True:
             # receive message
             message = ws.receive()
-            print user_name, message
             if message is None:
                 break;
             # broadcast message
+            app.logger.info(message)
             err_clients = set()
             for client in chat_clients:
                 try:
-                    client.send(user_name + "/" + message)
+                    client.send(message)
                 except Exception:
                     err_clients.add(client)
 
                 for ec in err_clients:
                     chat_clients.remove(ec)
 
-    except geventwebsocket.WebSocketError, ex:
-        print "{0}: {1}".format(ex.__class__.__name__, ex)
+    #except WebSocketError, ex:
+    except Exception:
+        app.logger.error('exception')
 
     finally:
         # 退室処理
         chat_clients.remove(ws)
-        print "bye!", user_name
+        app.logger.info("bye!")
 
 if __name__ == '__main__':
     # WebSocketHandler が environ['wsgi.websocket'] をセットする
