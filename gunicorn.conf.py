@@ -4,6 +4,11 @@ backlog = 2048
 worker_class = 'gevent'
 debug = True
 daemon = True
-pidfile = 'gunicorn.pid'
-logfile = 'gunicorn.log'
+pidfile = '/tmp/gunicorn.pid'
 
+logger_class = 'gunicorn.glogging.Logger'
+logfile = '/tmp/gunicorn.log'
+loglevel = 'debug'
+logconfig = None
+accesslog = 'gunicorn_access.log'
+errorlog = 'gunicorn_error.log'
